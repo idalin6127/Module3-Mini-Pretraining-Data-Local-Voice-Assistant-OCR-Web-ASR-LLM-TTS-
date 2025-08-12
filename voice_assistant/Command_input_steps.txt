@@ -1,0 +1,14 @@
+uvicorn main:app --reload
+
+
+cmd:
+cd C:\AI_Coop\Homework\Week3\voice_assistant
+
+curl -X POST -F "file=@test.wav" http://127.0.0.1:8000/chat/ --output response_test.wav
+
+
+
+python -m venv venv
+.\venv\Scripts\activate  or(.\venv\Scripts\Activate.ps1  这是在powershell中运行的)
+pip install --upgrade pip
+pip install fastapi uvicorn torch TTS

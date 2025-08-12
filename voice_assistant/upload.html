@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Voice Assistant Demo</title>
+</head>
+<body>
+  <h1>Voice Assistant Recording Test</h1>
+  <button id="recordBtn">Start Recording</button>
+  <button id="stopBtn" disabled>Stop Recording</button>
+  <p id="status">Status: Waiting to record</p>
+  <audio id="playback" controls></audio>
+  <h3>Assistant Response Audio:</h3>
+  <audio id="responseAudio" controls></audio>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+const recordBtn = document.getElementById("recordBtn");
+const stopBtn = document.getElementById("stopBtn");
+const status = document.getElementById("status");
+const playback = document.getElementById("playback");
+const responseAudio = document.getElementById("responseAudio");
+
+recordBtn.onclick = async () => {
+  audioChunks = [];
+  let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.start();
+  status.textContent = "Status: Recording...";
+  recordBtn.disabled = true;
+  stopBtn.disabled = false;
+
+  mediaRecorder.ondataavailable = event => {
+    audioChunks.push(event.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    playback.src = audioUrl;
+    status.textContent = "Status: Recording finished, uploading...";
+
+    // Send to FastAPI /chat/ endpoint
+    let formData = new FormData();
+    formData.append("file", audioBlob, "record.wav");
+
+    // fetch("http://127.0.0.1:8000/chat/", {
+    //   method: "POST",
+    //   body: formData
+    // })
+    // .then(response => response.blob())
+    // .then(blob => {
+    //   const respUrl = URL.createObjectURL(blob);
+    //   responseAudio.src = respUrl;
+    //   status.textContent = "Status: Received response audio";
+    // })
+    // .catch(err => {
+    //   console.error(err);
+    //   status.textContent = "Status: Upload or receive failed";
+    // });
+
+    fetch("http://127.0.0.1:8000/chat/", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => {
+      console.log("Response status:", response.status);
+      console.log("Response headers:", [...response.headers.entries()]);
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.blob();
+    })
+    .then(blob => {
+      console.log("Received blob:", blob);
+      const respUrl = URL.createObjectURL(blob);
+      responseAudio.src = respUrl;
+      status.textContent = "Status: Received response audio";
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      status.textContent = "Status: Upload or receive failed";
+    });
+
+    recordBtn.disabled = false;
+    stopBtn.disabled = true;
+  };
+};
+
+stopBtn.onclick = () => {
+  mediaRecorder.stop();
+  status.textContent = "Status: Stopped recording, processing...";
+};
+</script>
+</body>
+</html>
