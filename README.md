@@ -52,6 +52,21 @@ The project highlights the importance of **data quality for model performance** 
 
 ---
 
+## 🔥 Architecture / Workflow Diagram 
+flowchart LR
+  subgraph Data Pipeline
+    A[Scrape PDFs] --> B[OCR (Tesseract/Surya)]
+    B --> C[Cleaning (langdetect/regex)]
+    C --> D[MinHash Dedup]
+  end
+  subgraph Voice Agent
+    E[Audio Upload] --> F[ASR(Whisper)]
+    F --> G[LLM(LLaMA-3)+State]
+    G --> H[TTS(Co zyVoice)]
+  end
+
+---
+
 ## 📂 Deliverables
 - `clean_dataset/` → pretraining-ready text corpus (deduplicated, PII-free).  
 - `scraper/` → arXiv scraping and cleaning scripts.  
@@ -61,6 +76,18 @@ The project highlights the importance of **data quality for model performance** 
   - `stats.md` → dataset statistics (token counts, % removed).  
   - Conversation transcripts (JSON).  
 
+---
+
+
+## 🔥 How to Run / Quick Start 
+# Data pipeline
+pip install -r requirements.txt
+python build_corpus.py --topic "AI safety" --out dataset/
+
+# Voice agent
+uvicorn voice_agent.api:app --reload --port 8001
+# Test
+curl -X POST -F "file=@sample.wav" http://localhost:8001/talk
 ---
 
 ## 🌟 Highlights
@@ -78,5 +105,10 @@ The project highlights the importance of **data quality for model performance** 
 - **Conversational AI Development** – ASR + LLM + TTS integration in real time.  
 - **System Deployment** – FastAPI server design, API testing with curl/Postman.  
 - **Research-to-Production Thinking** – simulating SOTA LLM pretraining workflows.  
+
+---
+
+## 🚀 Future Improvements
+VAD/endpointing；speaker profiles；RAG grounding for factuality；latency tuning。
 
 ---
