@@ -1,4 +1,8 @@
-# Week 3 Project: Pretraining Data Pipeline & Voice Agent Development
+
+<p align="left">
+  <img src="logo/logo.png" alt="Project Logo" width="200"/>
+</p>
+# Module 3 Project: Pretraining Data Pipeline & Voice Agent Development
 
 ## 🚀 Quick Summary
 Built a **two-part project**:  
