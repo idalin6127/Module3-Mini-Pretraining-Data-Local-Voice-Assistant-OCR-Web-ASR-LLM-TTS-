@@ -1,6 +1,6 @@
 
 <p align="left">
-  <img src="logo/logo.png" alt="Project Logo" width="200"/>
+  <img src="logo/logo.png" alt="Project Logo" width="300"/>
 </p>
 # Module 3 Project: Pretraining Data Pipeline & Voice Agent Development
 
